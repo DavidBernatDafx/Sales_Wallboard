@@ -1,0 +1,15 @@
+<div id="tab_3_div">
+
+    <table>
+        {% include "sales_heading.html" %}
+
+        {% for i in range(tab_3.shape[0]) %}
+        <tr>
+            {% for j in range(tab_3.shape[1]) %}
+            <td>{{ tab_3.iloc[i, j] }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>

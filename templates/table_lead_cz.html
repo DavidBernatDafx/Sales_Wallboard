@@ -1,0 +1,16 @@
+<div id="tab_2_div">
+
+    <table>
+        {% include "lead_heading.html" %}
+
+        {% for i in range(tab_2.shape[0]) %}
+        <tr>
+            {% for j in range(tab_2.shape[1]) %}
+            <td>{{ tab_2.iloc[i, j] }}</td>
+            {% endfor %}
+        </tr>
+
+        {% endfor %}
+    </table>
+
+</div>

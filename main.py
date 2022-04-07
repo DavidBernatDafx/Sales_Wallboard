@@ -16,7 +16,6 @@ app = Flask(__name__)
 turbo = Turbo(app)
 
 
-
 load_dotenv("_env/.env")
 username = os.getenv("USERNAME")
 password = os.getenv("PASSWORD")
@@ -24,54 +23,52 @@ url = os.getenv("URL")
 driver_path = os.path.join(os.getcwd(), "Chromedriver", "chromedriver.exe")
 
 
-class Browser:
-    """Class that represents Chrome driver operations with data source webpage"""
-
-    def __init__(self):
-        self.options = Options()
-        # self.options.add_argument("--headless")
-        # self.options.add_argument("--disable-gpu")
-        self.service = Service(executable_path=driver_path)
-        self.driver = webdriver.Chrome(service=self.service, options=self.options)
-        # self.driver.minimize_window()
-        self.load_rslife()
-        self.login_rslife(user=username, pswd=password)
-        self.dataframes = self.get_data()
-        self.data_changed = False
-
-    def load_rslife(self):
-        self.driver.get(url=url)
-
-    def login_rslife(self, user: str, pswd: str):
-        username_field = self.driver.find_element(by=By.ID, value="Username")
-        password_field = self.driver.find_element(by=By.ID, value="Password")
-        submit_button = self.driver.find_element(by=By.XPATH, value="/html/body/div[2]/div/div/div/div/div["
-                                                                    "2]/form/div[5]/div/button")
-        username_field.send_keys(user)
-        password_field.send_keys(pswd)
-        submit_button.click()
-
-    def get_data(self):
-        data = self.driver.page_source
-        soup = BeautifulSoup(markup=data, features="html.parser")
-        tables = [
-            soup.select_one(selector="#WallboardCZ #Daily"),
-            soup.select_one(selector="#WallboardCZ #LeadAvgTime"),
-            soup.select_one(selector="#WallboardSK #Daily"),
-            soup.select_one(selector="#WallboardSK #LeadAvgTime")
-        ]
-        dataframes = [pd.read_html(f"<html>{table}</html>") for table in tables]
-        self.driver.close()
-        return [dataframe[0] for dataframe in dataframes]
+def start_source_browser():
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    service = Service(executable_path=driver_path)
+    driver = webdriver.Chrome(service=service, options=options)
+    driver.get(url=url)
+    username_field = driver.find_element(by=By.ID, value="Username")
+    password_field = driver.find_element(by=By.ID, value="Password")
+    submit_button = driver.find_element(by=By.XPATH, value="/html/body/div[2]/div/div/div/div/div[2]/form/div["
+                                                           "5]/div/button")
+    username_field.send_keys(username)
+    password_field.send_keys(password)
+    submit_button.click()
+    return driver
 
 
-def update_data():
-    with app.app_context():
-        while True:
-            turbo.push([turbo.replace(render_template("table_1.html"), "tab_1"),
-                        turbo.replace(render_template("time.html"), "time_div"),
-                        ])
-            time.sleep(10)
+def get_source_data(driver: webdriver.Chrome):
+    driver.refresh()
+    data = driver.page_source
+    soup = BeautifulSoup(markup=data, features="html.parser")
+    tables = [
+        soup.select_one(selector="#WallboardCZ #Daily"),
+        soup.select_one(selector="#WallboardCZ #LeadAvgTime"),
+        soup.select_one(selector="#WallboardSK #Daily"),
+        soup.select_one(selector="#WallboardSK #LeadAvgTime")
+    ]
+    dataframes = [pd.read_html(f"<html>{table}</html>") for table in tables]
+    driver.close()
+    dataframes = [dataframe[0]for dataframe in dataframes]
+
+    for df in dataframes:
+        if df.isna().values.any():
+            df.fillna(value="", inplace=True)
+
+    return dataframes
+
+
+@app.context_processor
+def inject_load():
+    rs_driver = start_source_browser()
+    src_data = get_source_data(driver=rs_driver)
+    now = datetime.datetime.now().strftime("%H:%M:%S")
+    data = {f"tab_{i+1}": src_data[i] for i in range(len(src_data))}
+    data["time"] = now
+    return data
 
 
 @app.before_first_request
@@ -79,22 +76,16 @@ def before_first_request():
     threading.Thread(target=update_data).start()
 
 
-@app.context_processor
-def inject_load():
-    browser = Browser()
-    now = datetime.datetime.now().strftime("%H:%M")
-
-    data = {"tab_1": browser.dataframes[0],
-            "time": now
-            }
-    # print(data)
-    return data
-
-
-
-
-
-
+def update_data():
+    with app.app_context():
+        while True:
+            turbo.push([turbo.replace(render_template("table_sales_cz.html"), "tab_1_div"),
+                        turbo.replace(render_template("table_lead_cz.html"), "tab_2_div"),
+                        turbo.replace(render_template("table_sales_sk.html"), "tab_3_div"),
+                        turbo.replace(render_template("table_lead_sk.html"), "tab_4_div"),
+                        turbo.replace(render_template("time.html"), "time_div"),
+                        ])
+            time.sleep(10)
 
 
 @app.route("/")
