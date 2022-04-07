@@ -7,12 +7,15 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import time
+import datetime
 from bs4 import BeautifulSoup
 import pandas as pd
 import threading
 
 app = Flask(__name__)
 turbo = Turbo(app)
+
+
 
 load_dotenv("_env/.env")
 username = os.getenv("USERNAME")
@@ -65,7 +68,9 @@ class Browser:
 def update_data():
     with app.app_context():
         while True:
-            turbo.push(turbo.replace(render_template("table_1.html"), "tab_1"))
+            turbo.push([turbo.replace(render_template("table_1.html"), "tab_1"),
+                        turbo.replace(render_template("time.html"), "time_div"),
+                        ])
             time.sleep(10)
 
 
@@ -75,9 +80,13 @@ def before_first_request():
 
 
 @app.context_processor
-def inject_data():
+def inject_load():
     browser = Browser()
-    data = {"tab_1": browser.dataframes[0]}
+    now = datetime.datetime.now().strftime("%H:%M")
+
+    data = {"tab_1": browser.dataframes[0],
+            "time": now
+            }
     # print(data)
     return data
 
