@@ -1,0 +1,71 @@
+<div id="tables">
+
+    <div class="row container-fluid">
+        <div class="col-lg-7 table-col">
+            <table class="table">
+
+                {% include "sales_heading.html" %}
+
+                <tbody>
+                {% for i in range(tab_1.shape[0]) %}
+                <tr>
+                    <th>{{ tab_1.iloc[i, 0] }}</th>
+                    {% for j in range(1, tab_1.shape[1]) %}
+                    <td>{{ tab_1.iloc[i, j] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-5 table-col">
+            <table class="table">
+                {% include "lead_heading.html" %}
+
+                {% for i in range(tab_2.shape[0]) %}
+                <tr>
+                    <th>{{ tab_2.iloc[i, 0] }}</th>
+                    {% for j in range(1, tab_2.shape[1]) %}
+                    <td>{{ tab_2.iloc[i, j] }}</td>
+                    {% endfor %}
+                </tr>
+
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div class="row container-fluid">
+        <div class="col-lg-7 table-col">
+            <table class="table">
+                {% include "sales_heading.html" %}
+
+                {% for i in range(tab_3.shape[0]) %}
+
+                <tr>
+                    <th>{{ tab_3.iloc[i, 0] }}</th>
+                    {% for j in range(1, tab_3.shape[1]) %}
+                    <td>{{ tab_3.iloc[i, j] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="col-lg-5 table-col">
+            <table class="table">
+                {% include "lead_heading.html" %}
+
+                {% for i in range(tab_4.shape[0]) %}
+                <tr>
+                    <th>{{ tab_4.iloc[i, 0] }}</th>
+                    {% for j in range(1, tab_4.shape[1]) %}
+                    <td>{{ tab_4.iloc[i, j] }}</td>
+                    {% endfor %}
+                </tr>
+
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</div>

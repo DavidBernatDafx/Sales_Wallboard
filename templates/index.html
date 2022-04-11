@@ -1,12 +1,28 @@
-{% extends "base.html" %}
+{% extends "bootstrap/base.html" %}
+
+{% block head %}
+    {{ super() }}
+    {{ turbo() }}
+    {% block styles%}
+        {{ super() }}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;500;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    {% endblock %}
+{% endblock %}
+
+{% block title %}
+4LD Sales Wallboard
+{% endblock %}
 
 {% block content %}
+<div class="bg-dark bg-gradient container-fluid">
 <h1>4Life Direct Sales Wallboard</h1>
 {% include "time.html" %}
-{% include "table_sales_cz.html" %}
-{% include "table_lead_cz.html" %}
-{% include "table_sales_sk.html" %}
-{% include "table_lead_sk.html" %}
+{% include "wallboard.html" %}
+</div>
 
 
 {% endblock %}
