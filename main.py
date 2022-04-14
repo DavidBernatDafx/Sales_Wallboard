@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 import time
 import datetime
 from bs4 import BeautifulSoup
@@ -18,12 +19,15 @@ app = Flask(__name__)
 turbo = Turbo(app)
 Bootstrap(app)
 
-load_dotenv("_env/.env")
+
+load_dotenv(os.path.join(os.getcwd(), "_env/.env"))
 username = os.getenv("USERNAME")
 password = os.getenv("PASSWORD")
 url = os.getenv("URL")
 driver_path = os.path.join(os.getcwd(), "Chromedriver", "chromedriver.exe")
 webapp_ip = os.getenv("WEB_APP_IP")
+print(username)
+
 
 class Browser:
 
@@ -42,6 +46,9 @@ class Browser:
         password_field = self.driver.find_element(by=By.ID, value="Password")
         submit_button = self.driver.find_element(by=By.XPATH, value="/html/body/div[2]/div/div/div/div/div["
                                                                     "2]/form/div[5]/div/button")
+        for i in range(9):
+            username_field.send_keys(Keys.BACKSPACE)
+            time.sleep(1)
         username_field.send_keys(username)
         password_field.send_keys(password)
         submit_button.click()
@@ -60,7 +67,6 @@ class Browser:
         dataframes = []
         try:
             dataframes = [pd.read_html(f"<html>{table}</html>") for table in tables]
-            # self.driver.close()
         except ValueError:
             dataframes = self.dataframes
         else:
@@ -76,6 +82,8 @@ class Browser:
 
 rs_web = Browser()
 rs_web.do_login()
+# test = rs_web.get_source_data()
+# print(test)
 
 
 @app.context_processor
@@ -90,7 +98,6 @@ def inject_load():
 
 @app.before_first_request
 def before_first_request():
-    # threading.Thread(target=Browser.get_source_data).start()
     threading.Thread(target=update_data).start()
 
 
@@ -105,9 +112,10 @@ def update_data():
 
 @app.route("/")
 def main_page():
-
-    return render_template("index.html")
+    flags = ["https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag-map_of_the_Czech_Republic.svg",
+             "https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag-map_of_Slovakia.svg"]
+    return render_template("index.html", flags=flags)
 
 
 if __name__ == "__main__":
-    app.run(host=webapp_ip)
+    app.run(debug=True, host=webapp_ip)

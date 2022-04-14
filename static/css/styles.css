@@ -13,7 +13,7 @@ table {
 
 td {
 /*     background-color: black; */
-    font-size: 4.5rem;
+    font-size: 3.5rem;
 
     text-align: right;
 }
@@ -24,10 +24,10 @@ th {
     text-align: right !important;
 }
 
-.container-fluid {
-    padding: 0% 0%;
-}
+.first-column {
+    padding-right: 0%;
+    }
 
-.table-col {
-    padding: 1% 1%;
+.flag-map {
+    height: 41px;
 }
