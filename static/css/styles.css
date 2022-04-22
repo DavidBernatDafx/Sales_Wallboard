@@ -1,20 +1,26 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background-image: linear-gradient(135deg, #a41c58, #dc1c14, #a41c58);
+/*     background-image: linear-gradient(135deg, #a41c58, #dc1c14, #a41c58); */
     color: white;
 }
 
-table {
+.table {
 
     background-image: linear-gradient(black, grey);
     text-shadow: 5px 5px 5px black;
 }
 
-td {
-/*     background-color: black; */
-    font-size: 3.5rem;
 
+
+.tbody-sales {
+
+    font-size: 3.5rem;
+    text-align: right;
+}
+
+.tbody-vcc {
+    font-size: 3rem;
     text-align: right;
 }
 
@@ -22,6 +28,8 @@ th {
     font-size: 3rem;
     vertical-align: middle !important;
     text-align: right !important;
+
+
 }
 
 .first-column {
@@ -30,4 +38,10 @@ th {
 
 .flag-map {
     height: 41px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }

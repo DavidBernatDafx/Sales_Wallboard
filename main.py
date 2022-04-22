@@ -1,3 +1,4 @@
+import requests.exceptions
 from flask import Flask, render_template
 from turbo_flask import Turbo
 from flask_bootstrap import Bootstrap
@@ -13,6 +14,7 @@ import datetime
 from bs4 import BeautifulSoup
 import pandas as pd
 import threading
+from vcc import VccApi, VccUsers, VccRealTime
 
 app = Flask(__name__)
 # Bootstrap(app)
@@ -21,12 +23,16 @@ Bootstrap(app)
 
 
 load_dotenv(os.path.join(os.getcwd(), "_env/.env"))
-username = os.getenv("USERNAME")
+username = "david.bernat"
 password = os.getenv("PASSWORD")
 url = os.getenv("URL")
 driver_path = os.path.join(os.getcwd(), "Chromedriver", "chromedriver.exe")
 webapp_ip = os.getenv("WEB_APP_IP")
-print(username)
+
+today = datetime.datetime.now()
+start = today.replace(hour=9, minute=0, second=0)
+end = today.replace(hour=17, minute=30, second=0)
+shift_duration = end - start
 
 
 class Browser:
@@ -62,7 +68,9 @@ class Browser:
             soup.select_one(selector="#WallboardCZ #Daily"),
             soup.select_one(selector="#WallboardCZ #LeadAvgAge"),
             soup.select_one(selector="#WallboardSK #Daily"),
-            soup.select_one(selector="#WallboardSK #LeadAvgAge")
+            soup.select_one(selector="#WallboardSK #LeadAvgAge"),
+            soup.select_one(selector="#WallboardPL #Daily"),
+            soup.select_one(selector="#WallboardPL #LeadAvgAge")
         ]
         dataframes = []
         try:
@@ -80,19 +88,51 @@ class Browser:
             return dataframes
 
 
+def evaluate_data(col_plan: int, col_current: int):
+    global shift_duration
+    global start
+    now = datetime.datetime.now()
+    duration_progress = now - start
+    duration_percentage = duration_progress / shift_duration * 100
+
+    if col_plan != 0:
+        plan_percentage = col_current / col_plan * 100
+        if col_current >= col_plan:
+            return "green"
+        elif plan_percentage * 0.9 < duration_percentage:
+            return "red"
+        else:
+            return "white"
+    else:
+        return "white"
+
+
 rs_web = Browser()
 rs_web.do_login()
-# test = rs_web.get_source_data()
-# print(test)
+vcc_users = VccUsers(url="/users")
 
 
 @app.context_processor
 def inject_load():
     src_data = rs_web.get_source_data()
-    print(src_data[0])
-    now = datetime.datetime.now().strftime("%H:%M:%S")
+    vcc = VccRealTime(url="/onlineusers")
+    try:
+        vcc_data = vcc.process_data(user_data=vcc_users.export_data)
+    except requests.exceptions.HTTPError:
+        vcc_data = vcc.export_data
+    # print(vcc_data[0])
+    for i in range(0, len(src_data), 2):
+        src_data[i]["res_sales"] = src_data[i].apply(
+            lambda row: evaluate_data(row["Daily Target"], row["Actual"]), axis=1)
+        src_data[i]["res_wol"] = src_data[i].apply(
+            lambda row: evaluate_data(row["Daily Target WoL"], row["Actual WoL"]), axis=1)
+    now = datetime.datetime.now().strftime("%H:%M")
     data = {f"tab_{i+1}": src_data[i] for i in range(len(src_data))}
     data["time"] = now
+    data["vcc_sales"] = vcc_data[0]
+    data["vcc_cs"] = vcc_data[1]
+    # print(data["vcc"][0])
+
     return data
 
 
@@ -106,15 +146,31 @@ def update_data():
         while True:
             turbo.push([turbo.replace(render_template("wallboard.html"), "tables"),
                         turbo.replace(render_template("time.html"), "time_div"),
+                        turbo.replace(render_template("wallboard_vcc.html"), "vcc_tables"),
+                        turbo.replace(render_template("wallboard_pl.html"), "pl_tables")
                         ])
-            time.sleep(30)
+            time.sleep(15)
 
 
-@app.route("/")
+@app.route("/sales")
 def main_page():
     flags = ["https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag-map_of_the_Czech_Republic.svg",
              "https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag-map_of_Slovakia.svg"]
-    return render_template("index.html", flags=flags)
+    year = today.year
+    return render_template("index.html", flags=flags, year=year)
+
+
+@app.route("/vcc")
+def vcc_page():
+    flag = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Flag-map_of_Poland.svg/1024px-Flag-map_of_Poland.svg.png"
+    year = today.year
+    return render_template("vcc.html", flag=flag, year=year)
+
+
+@app.route("/pl/sales")
+def pl_sales():
+    year = today.year
+    return render_template("pl_sales.html", year=year)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,75 @@
+<div id="vcc_tables">
+    <div class="row container-fluid">
+        <div class="col-lg-6">
+            <h1>Sales</h1>
+            <table class="table table-vcc ">
+                {% include "vcc_heading.html" %}
+
+                <tbody class="tbody-vcc">
+                {% for i in range(0, vcc_sales.shape[0]) %}
+
+                <tr>
+                    {% if vcc_sales.iloc[i, 1] == "Call" %}
+                    <th>{{ vcc_sales.iloc[i, 0] }}</th>
+                    <td style="color: lightgreen">{{ vcc_sales.iloc[i, 1] }}</td>
+
+
+                    {% elif vcc_sales.iloc[i, 1] == "Available" %}
+                    <th>{{ vcc_sales.iloc[i, 0] }}</th>
+                    <td style="color: red">{{ vcc_sales.iloc[i, 1] }}</td>
+
+                    {% elif vcc_sales.iloc[i, 1] == "Afterwork" %}
+                    <th>{{ vcc_sales.iloc[i, 0] }}</th>
+                    <td style="color: orange">{{ vcc_sales.iloc[i, 1] }}</td>
+
+                    {% else %}
+                    <th>{{ vcc_sales.iloc[i, 0] }}</th>
+                    <td>{{ vcc_sales.iloc[i, 1] }}</td>
+
+                    {% endif %}
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    
+        <div class="col-lg-6">
+            <h1>Customer Service</h1>
+            <table class="table table-vcc">
+                {% include "vcc_heading.html" %}
+
+                <tbody class="tbody-vcc">
+                {% for i in range(0, vcc_cs.shape[0]) %}
+
+                <tr>
+                    {% if vcc_cs.iloc[i, 1] == "Call" %}
+                    <th>{{ vcc_cs.iloc[i, 0] }}</th>
+                    <td style="color: lightgreen">{{ vcc_cs.iloc[i, 1] }}</td>
+
+
+                    {% elif vcc_cs.iloc[i, 1] == "Available" %}
+                    <th>{{ vcc_cs.iloc[i, 0] }}</th>
+                    <td style="color: red">{{ vcc_cs.iloc[i, 1] }}</td>
+
+                    {% elif vcc_cs.iloc[i, 1] == "Afterwork" %}
+                    <th>{{ vcc_cs.iloc[i, 0] }}</th>
+                    <td style="color: oreange">{{ vcc_cs.iloc[i, 1] }}</td>}
+
+                    {% else %}
+                    <th>{{ vcc_cs.iloc[i, 0] }}</th>
+                    <td>{{ vcc_cs.iloc[i, 1] }}</td>
+
+                    {% endif %}
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+

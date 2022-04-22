@@ -1,0 +1,62 @@
+<div id="pl_tables">
+
+    <div class="row container-fluid">
+        <div class="col-lg-7 table-col">
+            <table class="table">
+
+                {% include "sales_heading_pl.html" %}
+
+                <tbody class="tbody-sales">
+                {% for i in range(tab_5.shape[0]) %}
+                <tr>
+                    <th>{{ tab_5.iloc[i, 0] }}</th>
+                    {% if tab_5.iloc[i, 7] == "green" %}
+                        {% for j in range(1, 4) %}
+                        <td style="color: lightgreen">{{ tab_5.iloc[i, j] }}</td>
+                        {% endfor %}
+                    {% elif tab_5.iloc[i, 7] == "red" %}
+                        {% for j in range(1, 4) %}
+                        <td style="color: red">{{ tab_5.iloc[i, j] }}</td>
+                        {% endfor %}
+                    {% elif tab_5.iloc[i, 7] == "white" %}
+                        {% for j in range(1, 4) %}
+                        <td>{{ tab_5.iloc[i, j] }}</td>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if tab_5.iloc[i, 8] == "green" %}
+                        {% for j in range(4, 7) %}
+                        <td style="color: lightgreen">{{ tab_5.iloc[i, j] }}</td>
+                        {% endfor %}
+                    {% elif tab_5.iloc[i, 8] == "red" %}
+                        {% for j in range(4, 7) %}
+                        <td style="color: red">{{ tab_5.iloc[i, j] }}</td>
+                        {% endfor %}
+                    {% elif tab_5.iloc[i, 8] == "white" %}
+                        {% for j in range(4, 7) %}
+                        <td>{{ tab_5.iloc[i, j] }}</td>
+                        {% endfor %}
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-5 table-col">
+            <table class="table">
+                {% include "pl_lead_heading.html" %}
+            <tbody class="tbody-sales">
+                {% for i in range(tab_6.shape[0]) %}
+                <tr>
+                    <th>{{ tab_6.iloc[i, 0] }}</th>
+                    {% for j in range(1, tab_6.shape[1]) %}
+                    <td>{{ tab_6.iloc[i, j] }}</td>
+                    {% endfor %}
+                </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
