@@ -143,25 +143,34 @@ def inject_load():
 
     df_czsk = src_data[0][["Daily Target",
                            "Actual",
-                           "To Go",
                            "Daily Target WoL",
                            "Actual WoL",
-                           "To Go WoL"
                            ]].add(src_data[2][["Daily Target",
                                                "Actual",
-                                               "To Go",
                                                "Daily Target WoL",
-                                               "Actual WoL",
-                                               "To Go WoL"]],
+                                               "Actual WoL"]],
                                   fill_value=0)
 
     df_czsk.insert(0, "Sale Source", src_data[0]["Sale Source"])
+
+    to_go = [
+        df_czsk["Daily Target"] - df_czsk["Actual"],
+        df_czsk["Daily Target WoL"] - df_czsk["Actual WoL"]
+    ]
+
+    df_czsk.insert(3, "To Go", to_go[0])
+    df_czsk.insert(6, "To Go WoL", to_go[1])
+
+    for i in range(df_czsk.shape[0]):
+        if df_czsk.iloc[i, 3] < 0:
+            df_czsk.iloc[i, 3] = 0
+        if df_czsk.iloc[i, 6] < 0:
+            df_czsk.iloc[i, 6] = 0
 
     df_czsk["res_sales"] = df_czsk.apply(
         lambda row: evaluate_data(row["Daily Target"], row["Actual"]), axis=1)
     df_czsk["res_wol"] = df_czsk.apply(
         lambda row: evaluate_data(row["Daily Target WoL"], row["Actual WoL"]), axis=1)
-
 
     now = datetime.datetime.now().strftime("%H:%M")
     data = {f"tab_{i+1}": src_data[i] for i in range(len(src_data))}
