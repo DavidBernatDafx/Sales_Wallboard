@@ -2,7 +2,7 @@
     <div class="row container-fluid">
         <div class="col-lg-6">
             <h1>Sales</h1>
-            <table class="table table-vcc ">
+            <table class="table">
                 {% include "vcc_heading.html" %}
 
                 <tbody class="tbody-vcc">
@@ -37,7 +37,7 @@
     
         <div class="col-lg-6">
             <h1>Customer Service</h1>
-            <table class="table table-vcc">
+            <table class="table">
                 {% include "vcc_heading.html" %}
 
                 <tbody class="tbody-vcc">
@@ -55,7 +55,7 @@
 
                     {% elif vcc_cs.iloc[i, 1] == "Afterwork" %}
                     <th>{{ vcc_cs.iloc[i, 0] }}</th>
-                    <td style="color: oreange">{{ vcc_cs.iloc[i, 1] }}</td>}
+                    <td style="color: orange">{{ vcc_cs.iloc[i, 1] }}</td>}
 
                     {% else %}
                     <th>{{ vcc_cs.iloc[i, 0] }}</th>

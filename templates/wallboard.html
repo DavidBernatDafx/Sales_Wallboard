@@ -2,50 +2,130 @@
 
     <div class="row container-fluid">
         <div class="col-lg-7 table-col">
-            <table class="table">
+                <table class="table">
 
                 {% include "sales_heading_cz.html" %}
 
                 <tbody class="tbody-sales">
-                {% for i in range(tab_1.shape[0]) %}
+
+                {% for i in range(tab_1.shape[0] - 2) %}
+
                 <tr>
                     <th>{{ tab_1.iloc[i, 0] }}</th>
                     {% if tab_1.iloc[i, 7] == "green" %}
-                        {% for j in range(1, 4) %}
-                        <td style="color: lightgreen">{{ tab_1.iloc[i, j] }}</td>
-                        {% endfor %}
+                    {% for j in range(1, 4) %}
+                    <td style="color: lightgreen">{{ tab_1.iloc[i, j] }}</td>
+                    {% endfor %}
                     {% elif tab_1.iloc[i, 7] == "red" %}
-                        {% for j in range(1, 4) %}
-                        <td style="color: red">{{ tab_1.iloc[i, j] }}</td>
-                        {% endfor %}
+                    {% for j in range(1, 4) %}
+                    <td style="color: red">{{ tab_1.iloc[i, j] }}</td>
+                    {% endfor %}
                     {% elif tab_1.iloc[i, 7] == "white" %}
-                        {% for j in range(1, 4) %}
-                        <td>{{ tab_1.iloc[i, j] }}</td>
-                        {% endfor %}
+                    {% for j in range(1, 4) %}
+                    <td>{{ tab_1.iloc[i, j] }}</td>
+                    {% endfor %}
                     {% endif %}
 
                     {% if tab_1.iloc[i, 8] == "green" %}
-                        {% for j in range(4, 7) %}
-                        <td style="color: lightgreen">{{ tab_1.iloc[i, j] }}</td>
-                        {% endfor %}
+                    {% for j in range(4, 7) %}
+                    <td style="color: lightgreen">{{ tab_1.iloc[i, j] }}</td>
+                    {% endfor %}
                     {% elif tab_1.iloc[i, 8] == "red" %}
-                        {% for j in range(4, 7) %}
-                        <td style="color: red">{{ tab_1.iloc[i, j] }}</td>
-                        {% endfor %}
+                    {% for j in range(4, 7) %}
+                    <td style="color: red">{{ tab_1.iloc[i, j] }}</td>
+                    {% endfor %}
                     {% elif tab_1.iloc[i, 8] == "white" %}
-                        {% for j in range(4, 7) %}
-                        <td>{{ tab_1.iloc[i, j] }}</td>
-                        {% endfor %}
+                    {% for j in range(4, 7) %}
+                    <td>{{ tab_1.iloc[i, j] }}</td>
+                    {% endfor %}
                     {% endif %}
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
+
+            <table class="table">
+                {% include "sales_heading_sk.html" %}
+                <tbody class="tbody-sales">
+                {% for i in range(tab_3.shape[0] - 2) %}
+                <tr>
+                    <th>{{ tab_3.iloc[i, 0] }}</th>
+                    {% if tab_3.iloc[i, 7] == "green" %}
+                    {% for j in range(1, 4) %}
+                    <td style="color: lightgreen">{{ tab_3.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% elif tab_3.iloc[i, 7] == "red" %}
+                    {% for j in range(1, 4) %}
+                    <td style="color: red">{{ tab_3.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% elif tab_3.iloc[i, 7] == "white" %}
+                    {% for j in range(1, 4) %}
+                    <td>{{ tab_3.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if tab_3.iloc[i, 8] == "green" %}
+                    {% for j in range(4, 7) %}
+                    <td style="color: lightgreen">{{ tab_3.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% elif tab_3.iloc[i, 8] == "red" %}
+                    {% for j in range(4, 7) %}
+                    <td style="color: red">{{ tab_3.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% elif tab_3.iloc[i, 8] == "white" %}
+                    {% for j in range(4, 7) %}
+                    <td>{{ tab_3.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            
+            <table class="table">
+                {% include "sales_heading_czsk.html" %}
+                <tbody class="tbody-sales">
+                {% for i in range(tab_sum.shape[0] - 1) %}
+                <tr>
+                    <th>{{ tab_sum.iloc[i, 0] }}</th>
+                    {% if tab_sum.iloc[i, 7] == "green" %}
+                    {% for j in range(1, 4) %}
+                    <td style="color: lightgreen">{{ tab_sum.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% elif tab_sum.iloc[i, 7] == "red" %}
+                    {% for j in range(1, 4) %}
+                    <td style="color: red">{{ tab_sum.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% elif tab_sum.iloc[i, 7] == "white" %}
+                    {% for j in range(1, 4) %}
+                    <td>{{ tab_sum.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if tab_sum.iloc[i, 8] == "green" %}
+                    {% for j in range(4, 7) %}
+                    <td style="color: lightgreen">{{ tab_sum.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% elif tab_sum.iloc[i, 8] == "red" %}
+                    {% for j in range(4, 7) %}
+                    <td style="color: red">{{ tab_sum.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% elif tab_sum.iloc[i, 8] == "white" %}
+                    {% for j in range(4, 7) %}
+                    <td>{{ tab_sum.iloc[i, j] }}</td>
+                    {% endfor %}
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
         </div>
+
         <div class="col-lg-5 table-col">
             <table class="table">
                 {% include "lead_heading.html" %}
-            <tbody class="tbody-sales">
+                <tbody class="tbody-sales">
                 {% for i in range(tab_2.shape[0]) %}
                 <tr>
                     <th>{{ tab_2.iloc[i, 0] }}</th>
@@ -57,53 +137,10 @@
                 {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
 
-    <div class="row container-fluid">
-        <div class="col-lg-7 table-col">
-            <table class="table">
-                {% include "sales_heading_sk.html" %}
-                <tbody class="tbody-sales">
-                {% for i in range(tab_3.shape[0]) %}
-                <tr>
-                    <th>{{ tab_3.iloc[i, 0] }}</th>
-                    {% if tab_3.iloc[i, 7] == "green" %}
-                        {% for j in range(1, 4) %}
-                        <td style="color: lightgreen">{{ tab_3.iloc[i, j] }}</td>
-                        {% endfor %}
-                    {% elif tab_3.iloc[i, 7] == "red" %}
-                        {% for j in range(1, 4) %}
-                        <td style="color: red">{{ tab_3.iloc[i, j] }}</td>
-                        {% endfor %}
-                    {% elif tab_3.iloc[i, 7] == "white" %}
-                        {% for j in range(1, 4) %}
-                        <td>{{ tab_3.iloc[i, j] }}</td>
-                        {% endfor %}
-                    {% endif %}
-
-                    {% if tab_3.iloc[i, 8] == "green" %}
-                        {% for j in range(4, 7) %}
-                        <td style="color: lightgreen">{{ tab_3.iloc[i, j] }}</td>
-                        {% endfor %}
-                    {% elif tab_3.iloc[i, 8] == "red" %}
-                        {% for j in range(4, 7) %}
-                        <td style="color: red">{{ tab_3.iloc[i, j] }}</td>
-                        {% endfor %}
-                    {% elif tab_3.iloc[i, 8] == "white" %}
-                        {% for j in range(4, 7) %}
-                        <td>{{ tab_3.iloc[i, j] }}</td>
-                        {% endfor %}
-                    {% endif %}
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-lg-5 table-col">
             <table class="table">
                 {% include "lead_heading.html" %}
-            <tbody class="tbody-sales">
+                <tbody class="tbody-sales">
                 {% for i in range(tab_4.shape[0]) %}
                 <tr>
                     <th>{{ tab_4.iloc[i, 0] }}</th>
@@ -113,7 +150,7 @@
                 </tr>
 
                 {% endfor %}
-            </tbody>
+                </tbody>
 
             </table>
         </div>

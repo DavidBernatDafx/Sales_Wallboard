@@ -14,7 +14,7 @@ import datetime
 from bs4 import BeautifulSoup
 import pandas as pd
 import threading
-from vcc import VccApi, VccUsers, VccRealTime
+from vcc import VccUsers, VccRealTime
 
 app = Flask(__name__)
 # Bootstrap(app)
@@ -110,24 +110,62 @@ def evaluate_data(col_plan: int, col_current: int):
 rs_web = Browser()
 rs_web.do_login()
 vcc_users = VccUsers(url="/users")
+old_vcc_data = []
+old_compass_data = []
 
 
 @app.context_processor
 def inject_load():
-    src_data = rs_web.get_source_data()
-    vcc = VccRealTime(url="/onlineusers")
+
+    global old_compass_data
+    global old_vcc_data
     try:
-        vcc_data = vcc.process_data(user_data=vcc_users.export_data)
+        vcc = VccRealTime(url="/onlineusers")
     except requests.exceptions.HTTPError:
-        vcc_data = vcc.export_data
+        vcc_data = old_vcc_data
+    else:
+        vcc_data = vcc.process_data(user_data=vcc_users.export_data)
+        old_vcc_data = vcc_data
+
+    try:
+        src_data = rs_web.get_source_data()
+    except ValueError:
+        src_data = old_compass_data
+    else:
+        old_compass_data = src_data
+
     # print(vcc_data[0])
     for i in range(0, len(src_data), 2):
         src_data[i]["res_sales"] = src_data[i].apply(
             lambda row: evaluate_data(row["Daily Target"], row["Actual"]), axis=1)
         src_data[i]["res_wol"] = src_data[i].apply(
             lambda row: evaluate_data(row["Daily Target WoL"], row["Actual WoL"]), axis=1)
+
+    df_czsk = src_data[0][["Daily Target",
+                           "Actual",
+                           "To Go",
+                           "Daily Target WoL",
+                           "Actual WoL",
+                           "To Go WoL"
+                           ]].add(src_data[2][["Daily Target",
+                                               "Actual",
+                                               "To Go",
+                                               "Daily Target WoL",
+                                               "Actual WoL",
+                                               "To Go WoL"]],
+                                  fill_value=0)
+
+    df_czsk.insert(0, "Sale Source", src_data[0]["Sale Source"])
+
+    df_czsk["res_sales"] = df_czsk.apply(
+        lambda row: evaluate_data(row["Daily Target"], row["Actual"]), axis=1)
+    df_czsk["res_wol"] = df_czsk.apply(
+        lambda row: evaluate_data(row["Daily Target WoL"], row["Actual WoL"]), axis=1)
+
+
     now = datetime.datetime.now().strftime("%H:%M")
     data = {f"tab_{i+1}": src_data[i] for i in range(len(src_data))}
+    data["tab_sum"] = df_czsk
     data["time"] = now
     data["vcc_sales"] = vcc_data[0]
     data["vcc_cs"] = vcc_data[1]
@@ -162,7 +200,8 @@ def main_page():
 
 @app.route("/vcc")
 def vcc_page():
-    flag = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Flag-map_of_Poland.svg/1024px-Flag-map_of_Poland.svg.png"
+    flag = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/" \
+           "Flag-map_of_Poland.svg/1024px-Flag-map_of_Poland.svg.png"
     year = today.year
     return render_template("vcc.html", flag=flag, year=year)
 
