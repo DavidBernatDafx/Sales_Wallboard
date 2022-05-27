@@ -15,9 +15,12 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import threading
 from vcc import VccUsers, VccRealTime
+# from waitress import serve
+# from flask_socketio import SocketIO, emit
+
 
 app = Flask(__name__)
-# Bootstrap(app)
+
 turbo = Turbo(app)
 Bootstrap(app)
 
@@ -61,9 +64,15 @@ class Browser:
 
     def get_source_data(self):
         self.driver.refresh()
-        time.sleep(1)
+        time.sleep(5)
         data = self.driver.page_source
         soup = BeautifulSoup(markup=data, features="html.parser")
+        # selectors = ["#WallboardCZ #Daily", "#WallboardCZ #LeadAvgAge",
+        #              "WallboardSK #Daily", "#WallboardSK #LeadAvgAge",
+        #              "#WallboardPL #Daily", "#WallboardPL #LeadAvgAge",
+        #              ]
+
+        # tables = [soup.select_one(selector=sel) for sel in selectors]
         tables = [
             soup.select_one(selector="#WallboardCZ #Daily"),
             soup.select_one(selector="#WallboardCZ #LeadAvgAge"),
@@ -72,20 +81,31 @@ class Browser:
             soup.select_one(selector="#WallboardPL #Daily"),
             soup.select_one(selector="#WallboardPL #LeadAvgAge")
         ]
-        dataframes = []
-        try:
-            dataframes = [pd.read_html(f"<html>{table}</html>") for table in tables]
-        except ValueError:
-            dataframes = self.dataframes
-        else:
-            dataframes = [dataframe[0] for dataframe in dataframes]
+        print(f"length of tables: {len(tables)}\n")
+        # print(tables)
+        dataframes = [pd.read_html(f"<html>{tab}</html>")[0] for tab in tables]
 
-            for df in dataframes:
-                if df.isna().values.any():
-                    df.fillna(value="", inplace=True)
-            self.dataframes = dataframes
-        finally:
-            return dataframes
+        for df in dataframes:
+            if df.isna().values.any():
+                df.fillna(value="", inplace=True)
+
+        print(f"Length od dataframes: {len(dataframes)}")
+
+        return dataframes
+
+        # try:
+        #     dataframes = [pd.read_html(f"<html>{table}</html>") for table in tables]
+        # except ValueError:
+        #     dataframes = self.dataframes
+        # else:
+        #     dataframes = [dataframe[0] for dataframe in dataframes]
+        #
+        #     for df in dataframes:
+        #         if df.isna().values.any():
+        #             df.fillna(value="", inplace=True)
+        #     self.dataframes = dataframes
+        # finally:
+        #     return dataframes
 
 
 def evaluate_data(col_plan: int, col_current: int):
@@ -119,6 +139,7 @@ def inject_load():
 
     global old_compass_data
     global old_vcc_data
+
     try:
         vcc = VccRealTime(url="/onlineusers")
     except requests.exceptions.HTTPError:
@@ -127,19 +148,22 @@ def inject_load():
         vcc_data = vcc.process_data(user_data=vcc_users.export_data)
         old_vcc_data = vcc_data
 
+    # try:
+    src_data = rs_web.get_source_data()
+
+    print(type(src_data))
+    print(type(src_data[0]))
+
     try:
-        src_data = rs_web.get_source_data()
-    except ValueError:
+        for i in range(0, len(src_data), 2):
+            src_data[i]["res_sales"] = src_data[i].apply(
+                lambda row: evaluate_data(row["Daily Target"], row["Actual"]), axis=1)
+            src_data[i]["res_wol"] = src_data[i].apply(
+                lambda row: evaluate_data(row["Daily Target WoL"], row["Actual WoL"]), axis=1)
+    except IndexError:
         src_data = old_compass_data
     else:
-        old_compass_data = src_data
-
-    # print(vcc_data[0])
-    for i in range(0, len(src_data), 2):
-        src_data[i]["res_sales"] = src_data[i].apply(
-            lambda row: evaluate_data(row["Daily Target"], row["Actual"]), axis=1)
-        src_data[i]["res_wol"] = src_data[i].apply(
-            lambda row: evaluate_data(row["Daily Target WoL"], row["Actual WoL"]), axis=1)
+        old_compass_data=src_data
 
     df_czsk = src_data[0][["Daily Target",
                            "Actual",
